@@ -6,9 +6,9 @@ import os
 import argparse
 
 from session.cli import SessionCLI
-from session.handler import Session
+from session.session import Session
 from database.cli import DatabaseCLI
-from database.handler import Database
+from database.database import Database
 
 '''
 This script will use as shortcut to open terminal with mostly used directories

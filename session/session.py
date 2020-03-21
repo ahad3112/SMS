@@ -17,6 +17,16 @@ class Session:
         self.db = db
         getattr(self, subcommand)()
 
+    def __all_sessions(self, *, tables):
+        sessions = {}
+        for table in tables:
+            query_string = 'select session from {0}'.format(table)
+            self.db.query(table=table, query_string=query_string)
+            results = [session[0] for session in self.db.cursor.fetchall()]
+            sessions[table] = list(set(results))
+
+        return sessions
+
     def save(self):
         # get all opened tabs
         cmd = "/usr/bin/osascript -e 'tell application \"{0}\"' -e 'get URL of every tab of every window' -e 'end tell'"
@@ -93,12 +103,13 @@ class Session:
         if return_result:
             return query_result
 
-    def delete_row(self, *, records, index):
-        sql_string = 'delete from {0} where session = ? and command = ? and links = ?'.format(config.TABLES['links'])
-        for (idx, record) in records:
-            if idx == index:
-                self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=record, commit=True)
-                break
+    def view_test(self, *pargs, **kwargs):
+        if self.args.all_sessions:
+            print('list of all session')
+            sessions = self.__all_sessions(tables=config.TABLES.values())
+            print(sessions)
+        elif self.args.name:
+            print('Record for a single session')
 
     def edit(self):
         records = self.view(return_result=True)
@@ -117,3 +128,10 @@ class Session:
                     print('Wrong choice. Try Again.')
         else:
             Display.warning(what='Edit not possible for {0} '.format(self.name), info='[ NO RECORDS ]')
+
+    def delete_row(self, *, records, index):
+        sql_string = 'delete from {0} where session = ? and command = ? and links = ?'.format(config.TABLES['links'])
+        for (idx, record) in records:
+            if idx == index:
+                self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=record, commit=True)
+                break

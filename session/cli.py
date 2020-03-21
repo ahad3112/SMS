@@ -9,29 +9,41 @@ class SessionCLI:
                 description='This module will open a saved session',
                 args=[
                     Argument(
-                        name=('name',),
+                        name=('-n', '--name',),
                         type=str,
                         help='Later',
+                        required=True
                     ),
                 ]),
-        Command(name='view',
+        Command(name='view_test',
                 help='view a saved session',
-                description='This module display a saved session',
+                description='This module display saved session using the session name',
                 args=[
                     Argument(
-                        name=('name',),
+                        name=('-n', '--name',),
                         type=str,
-                        help='Later'
+                        help='Display all records for this session name.',
+                        group='view_option',
+                        required=False
                     ),
-                ]),
+                    Argument(
+                        name=('-as', '--all-sessions',),
+                        help='Display all sessions from the database.',
+                        action='store_true',
+                        group='view_option',
+                        required=False
+                    ),
+                ],
+                mutually_exclusive_group={'view_option': None}),
         Command(name='edit',
                 help='edit a saved session',
                 description='This module helps edit a saved session',
                 args=[
                     Argument(
-                        name=('name',),
+                        name=('-n', '--name',),
                         type=str,
-                        help='Later'
+                        help='Later',
+                        required=True
                     ),
                 ]),
         Command(name='save',
@@ -71,9 +83,26 @@ class SessionCLI:
                                                  description=command.description,
                                                  help=command.help
                                                  )
+            # adding mutually exclusive group
+            if command.mutually_exclusive_group:
+                command.add_mutually_exclusive_groups(parser)
 
             for arg in command.args:
+                if arg.group and arg.group in command.mutually_exclusive_group:
+                    parser = command.mutually_exclusive_group[arg.group]
+
                 if arg.action in ['store_true', 'store_false']:
-                    parser.add_argument(*arg.name, help=arg.help, action=arg.action)
+                    parser.add_argument(
+                        *arg.name,
+                        help=arg.help,
+                        action=arg.action
+                    )
                 else:
-                    parser.add_argument(*arg.name, help=arg.help, type=arg.type, choices=arg.choices, action=arg.action)
+                    parser.add_argument(
+                        *arg.name,
+                        help=arg.help,
+                        type=arg.type,
+                        choices=arg.choices,
+                        action=arg.action,
+                        required=arg.required
+                    )

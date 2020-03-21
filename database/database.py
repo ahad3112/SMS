@@ -114,8 +114,11 @@ class Database:
         if commit:
             self.connection.commit()
 
-    def query(self, *, table, query_string, values):
+    def query(self, *, table, query_string, values=None):
         if self.__table_exists(table=table):
-            self.cursor.execute(query_string, values)
+            if values:
+                self.cursor.execute(query_string, values)
+            else:
+                self.cursor.execute(query_string)
         else:
             Display.fail(what='Query on table {0} '.format(table), info='[ NOT EXIST ]')
