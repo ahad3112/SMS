@@ -15,7 +15,7 @@ class SessionCLI:
                         required=True
                     ),
                 ]),
-        Command(name='view_test',
+        Command(name='view',
                 help='view a saved session',
                 description='This module display saved session using the session name',
                 args=[

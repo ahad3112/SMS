@@ -1,4 +1,4 @@
 # ```SMS```
 ```Save My Session/Soul```
-Stay tuned!
+**Stay tuned!**
 More details coming soon!

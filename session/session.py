@@ -18,12 +18,16 @@ class Session:
         getattr(self, subcommand)()
 
     def __all_sessions(self, *, tables):
-        sessions = {}
+        sessions = []
         for table in tables:
             query_string = 'select session from {0}'.format(table)
             self.db.query(table=table, query_string=query_string)
             results = [session[0] for session in self.db.cursor.fetchall()]
-            sessions[table] = list(set(results))
+            result = list(set(results))
+            if not results:
+                continue
+
+            sessions.append([table, result])
 
         return sessions
 
@@ -82,9 +86,10 @@ class Session:
         self.db.query(table=config.TABLES['links'], query_string=query_string, values=[self.name])
 
         for (name, command, args) in self.db.cursor.fetchall():
+            # ?????????? Space within the command is not working
             call(command + args, shell=True)
 
-    def view(self, *, return_result=False):
+    def view_old(self, *, return_result=False):
         # Tesing view to view the entries in apps table
         # Later will show only specially requested entries: eg  links, shell
         query_string = 'select * from {0} where session = ?'.format(config.TABLES['links'])
@@ -103,16 +108,34 @@ class Session:
         if return_result:
             return query_result
 
-    def view_test(self, *pargs, **kwargs):
+    def __record(self, *, table):
+        query_string = 'select * from {0} where session = ?'.format(
+            table,
+            self.name
+        )
+        self.db.query(table=table, query_string=query_string, values=[self.name])
+        return self.db.cursor.fetchall()
+
+    def view(self, *pargs, **kwargs):
         if self.args.all_sessions:
-            print('list of all session')
             sessions = self.__all_sessions(tables=config.TABLES.values())
-            print(sessions)
+            Display.dataframe(
+                headers=['Table Name', 'List of Session'],
+                rows=sessions
+            )
         elif self.args.name:
             print('Record for a single session')
+            headers = ['Session Name', 'Command', 'Arguments']
+            for table in config.TABLES.values():
+                records = self.__record(table=table)
+                Display.dataframe(
+                    headers=headers,
+                    rows=records
+                )
 
     def edit(self):
-        records = self.view(return_result=True)
+        #  We will update this module later along with the view_old method
+        records = self.view_old(return_result=True)
         if records:
             while True:
                 action = input('Press A/a to add or D/d to delete. ')
