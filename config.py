@@ -18,8 +18,8 @@ DB_TABLES = {
 
 
 # Supported Browsers
-SUPPORTED_BROWSERS = {'Google Chrome': b'open -a Google Chrome ',
-                      'Safari': b'open -a Safari ',
+SUPPORTED_BROWSERS = {'Google Chrome': 'open -a Google\\ Chrome ',
+                      'Safari': 'open -a Safari ',
                       }
 
 # For testing

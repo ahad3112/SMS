@@ -65,7 +65,7 @@ class Session:
                         raise AssertionError('Multiple same entry for the Session: "{0}"'.format(self.name))
 
                     # save unique entry
-                    self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=(self.name, config.SUPPORTED_BROWSERS[browser], link.strip()), commit=True)
+                    self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=(self.name, config.SUPPORTED_BROWSERS[browser], link.strip().decode()), commit=True)
 
                     # Pringint progress bar
                     progress = progress_bar.format('=' * (current - 1) + '>', 124, current, 4)
@@ -86,7 +86,6 @@ class Session:
         self.db.query(table=config.TABLES['links'], query_string=query_string, values=[self.name])
 
         for (name, command, args) in self.db.cursor.fetchall():
-            # ?????????? Space within the command is not working
             call(command + args, shell=True)
 
     def view_old(self, *, return_result=False):
@@ -124,33 +123,45 @@ class Session:
                 rows=sessions
             )
         elif self.args.name:
-            print('Record for a single session')
-            headers = ['Session Name', 'Command', 'Arguments']
+            headers = ['Command', 'Arguments']
             for table in config.TABLES.values():
+                Display.title(title='Record for Session : {0} , Table: {1}'.format(self.name, table))
                 records = self.__record(table=table)
                 Display.dataframe(
                     headers=headers,
-                    rows=records
+                    rows=[(cmd, arg) for (sess, cmd, arg) in records]
                 )
 
+    def __edit_links(self):
+        records = self.__record(table=config.TABLES['links'])
+        Display.title(title='Record for Session : {0} , Table: {1}'.format(self.name, config.TABLES['links']))
+        Display.dataframe(
+            headers=['Command', 'Arguments'],
+            rows=[(cmd, arg) for (sess, cmd, arg) in records]
+        )
+
     def edit(self):
-        #  We will update this module later along with the view_old method
-        records = self.view_old(return_result=True)
-        if records:
-            while True:
-                action = input('Press A/a to add or D/d to delete. ')
-                if action in ['D', 'd']:
-                    no = input('Choose number from the list to delete? ')
-                    print('Deleting {0!s}'.format(no))
-                    self.delete_row(records=records, index=int(no))
-                    break
-                elif action in ['A', 'a']:
-                    print('Add action has been choosen..')
-                    break
-                else:
-                    print('Wrong choice. Try Again.')
+        if self.args.links:
+            self.__edit_links()
         else:
-            Display.warning(what='Edit not possible for {0} '.format(self.name), info='[ NO RECORDS ]')
+            pass
+        #  We will update this module later along with the view_old method
+        # records = self.view_old(return_result=True)
+        # if records:
+        #     while True:
+        #         action = input('Press A/a to add or D/d to delete. ')
+        #         if action in ['D', 'd']:
+        #             no = input('Choose number from the list to delete? ')
+        #             print('Deleting {0!s}'.format(no))
+        #             self.delete_row(records=records, index=int(no))
+        #             break
+        #         elif action in ['A', 'a']:
+        #             print('Add action has been choosen..')
+        #             break
+        #         else:
+        #             print('Wrong choice. Try Again.')
+        # else:
+        #     Display.warning(what='Edit not possible for {0} '.format(self.name), info='[ NO RECORDS ]')
 
     def delete_row(self, *, records, index):
         sql_string = 'delete from {0} where session = ? and command = ? and links = ?'.format(config.TABLES['links'])

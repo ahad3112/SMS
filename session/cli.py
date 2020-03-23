@@ -45,6 +45,11 @@ class SessionCLI:
                         help='Later',
                         required=True
                     ),
+                    Argument(
+                        name=('-l', '--links',),
+                        help='Choose links list to be Edited.',
+                        action='store_true'
+                    ),
                 ]),
         Command(name='save',
                 help='saves current session',

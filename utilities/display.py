@@ -19,7 +19,6 @@ class Display:
             except Exception:
                 print('No Header of Data was provided for display.....')
         finally:
-            print('min_column_width {0}'.format(min_column_width))
             remaining_line_width = Display.line_width - min_column_width
             column_format = '{0!s:{1}<{2}}'
             headers.insert(0, 'No.')
@@ -79,7 +78,6 @@ class Display:
 
     @staticmethod
     def title(*, title):
-        title = Style.BRIGHT + Fore.BLUE + title + Style.RESET_ALL
         title = '{0: ^{1}}'.format(title, Display.line_width)
         print('-' * Display.line_width)
         print(title)
