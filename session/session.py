@@ -65,7 +65,13 @@ class Session:
                         raise AssertionError('Multiple same entry for the Session: "{0}"'.format(self.name))
 
                     # save unique entry
-                    self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=(self.name, config.SUPPORTED_BROWSERS[browser], link.strip().decode()), commit=True)
+                    self.db.update(
+                        table=config.TABLES['links'],
+                        sql_string=sql_string,
+                        values=(self.name, config.SUPPORTED_BROWSERS[browser], link.strip().decode()),
+                        commit=True,
+                        create_if_required=True
+                    )
 
                     # Pringint progress bar
                     progress = progress_bar.format('=' * (current - 1) + '>', 124, current, 4)
@@ -140,32 +146,35 @@ class Session:
             rows=[(cmd, arg) for (sess, cmd, arg) in records]
         )
 
+        while True:
+            Display.title(title='Edit Options')
+            Display.dataframe(
+                headers=['Action', 'keys'],
+                rows=[
+                    ('Add', 'a/A'),
+                    ('Delete', 'd/D'),
+                ]
+            )
+            key = input()
+            if key in ['a', 'A']:
+                Display.warnings(what='Adding to links ', info='[ Not Available Yet ]')
+            elif key in ['d', 'D']:
+                Display.info('Deleting Row ', info='[Type Row No.]')
+                row = input()
+                self.delete_row(table=config.TABLES['links'], records=records, row=row)
+            else:
+                Display.info(what='Editing ', info='[ Leaving ]')
+                break
+
     def edit(self):
         if self.args.links:
             self.__edit_links()
         else:
             pass
-        #  We will update this module later along with the view_old method
-        # records = self.view_old(return_result=True)
-        # if records:
-        #     while True:
-        #         action = input('Press A/a to add or D/d to delete. ')
-        #         if action in ['D', 'd']:
-        #             no = input('Choose number from the list to delete? ')
-        #             print('Deleting {0!s}'.format(no))
-        #             self.delete_row(records=records, index=int(no))
-        #             break
-        #         elif action in ['A', 'a']:
-        #             print('Add action has been choosen..')
-        #             break
-        #         else:
-        #             print('Wrong choice. Try Again.')
-        # else:
-        #     Display.warning(what='Edit not possible for {0} '.format(self.name), info='[ NO RECORDS ]')
 
-    def delete_row(self, *, records, index):
-        sql_string = 'delete from {0} where session = ? and command = ? and links = ?'.format(config.TABLES['links'])
-        for (idx, record) in records:
-            if idx == index:
+    def delete_row(self, *, table, records, row):
+        sql_string = 'delete from {0} where session = ? and command = ? and links = ?'.format(table)
+        for (idx, record) in enumerate(records):
+            if idx == int(row):
                 self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=record, commit=True)
                 break

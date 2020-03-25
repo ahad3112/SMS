@@ -3,7 +3,7 @@ from colorama import Fore, Back, Style
 
 class Display:
     line_width = 130
-    msg_width = 100
+    msg_width = 115
     info_width = line_width - msg_width
     header_height = 5
 
@@ -77,6 +77,10 @@ class Display:
         return Fore.CYAN + head + Style.RESET_ALL
 
     @staticmethod
+    def input(*, keys, actions):
+        Display.title(title='Edit option')
+
+    @staticmethod
     def title(*, title):
         title = '{0: ^{1}}'.format(title, Display.line_width)
         print('-' * Display.line_width)
@@ -86,12 +90,11 @@ class Display:
 
     @staticmethod
     def info(what='', info='W'):
-        info = Style.BRIGHT + Fore.BLUE + info + Style.RESET_ALL
         print('{0:-<{1}} : {2:>{3}}'.format(what, Display.msg_width, info, Display.info_width))
 
     @staticmethod
     def success(what='', info='✓', end='\n'):
-        info = Style.BRIGHT + Fore.YELLOW + info + Style.RESET_ALL
+        # info = Style.BRIGHT + Fore.YELLOW + info + Style.RESET_ALL
         print('{0:><{1}} : {2:>{3}}'.format(what, Display.msg_width, info, Display.info_width), end=end)
 
     @staticmethod

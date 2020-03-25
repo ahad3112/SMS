@@ -42,7 +42,7 @@ class Database:
         except FileNotFoundError:
             print(Display.fail(config.DB_NAME, info='[ DOES NOT EXIST ]'))
         else:
-            print('Database {0} deleted successfully'.format(config.DB_NAME))
+            Display.success(what='Deleting DB: {0} '.format(config.DB_NAME), info='[ SUCCESS ]')
 
     def drop(self, *, args):
         if args.table:
@@ -106,9 +106,12 @@ class Database:
                 table
             ))
 
-    def update(self, *, table, sql_string, values, commit=False):
+    def update(self, *, table, sql_string, values, commit=False, create_if_required=False):
         if not self.__table_exists(table=table):
-            self.create_table(table=table)
+            if create_if_required:
+                self.create_table(table=table)
+            else:
+                return
         self.cursor.execute(sql_string, values)
 
         if commit:
