@@ -50,6 +50,21 @@ class SessionCLI:
                         help='Choose links list to be Edited.',
                         action='store_true'
                     ),
+                    Argument(
+                        name=('-a', '--add',),
+                        help='add link/links',
+                        action='store_true'
+                    ),
+                    Argument(
+                        name=('-d', '--delete',),
+                        help='Delete link/links',
+                        action='store_true'
+                    ),
+                    Argument(
+                        name=('-o', '--open',),
+                        help='Open link/links',
+                        action='store_true'
+                    ),
                 ]),
         Command(name='save',
                 help='saves current session',

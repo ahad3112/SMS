@@ -94,25 +94,6 @@ class Session:
         for (name, command, args) in self.db.cursor.fetchall():
             call(command + args, shell=True)
 
-    def view_old(self, *, return_result=False):
-        # Tesing view to view the entries in apps table
-        # Later will show only specially requested entries: eg  links, shell
-        query_string = 'select * from {0} where session = ?'.format(config.TABLES['links'])
-        self.db.query(table=config.TABLES['links'], query_string=query_string, values=[self.name])
-
-        query_result = list(enumerate(self.db.cursor.fetchall()))
-        if not query_result:
-            return
-
-        Display.header(head=' Record for {0} '.format(self.name))
-        print('{0:<10}{1:<40}{2:<70}'.format('No.', 'Command', 'Arguments'))
-        print('{0:<10}{1:<40}{2:<70}'.format('', '-' * len('Command'), '-' * len('Arguments')))
-        for (index, (session, command, args)) in query_result:
-            print('{0!s:<10}{1!s:<40}{2!s:<80}'.format(index, command.decode().strip(), args.decode().strip()))
-
-        if return_result:
-            return query_result
-
     def __record(self, *, table):
         query_string = 'select * from {0} where session = ?'.format(
             table,
@@ -138,33 +119,69 @@ class Session:
                     rows=[(cmd, arg) for (sess, cmd, arg) in records]
                 )
 
-    def __edit_links(self):
-        records = self.__record(table=config.TABLES['links'])
-        Display.title(title='Record for Session : {0} , Table: {1}'.format(self.name, config.TABLES['links']))
+    def __display_links_for_edit(self, table, records):
+        Display.title(title='Record for Session : {0}, Table: {1}'.format(self.name, table))
         Display.dataframe(
             headers=['Command', 'Arguments'],
             rows=[(cmd, arg) for (sess, cmd, arg) in records]
         )
 
+    def __edit_links(self):
+        records = self.__record(table=config.TABLES['links'])
+        self.__display_links_for_edit(table=config.TABLES['links'], records=records)
+
         while True:
-            Display.title(title='Edit Options')
-            Display.dataframe(
-                headers=['Action', 'keys'],
-                rows=[
-                    ('Add', 'a/A'),
-                    ('Delete', 'd/D'),
-                ]
-            )
-            key = input()
+            if self.args.add or self.args.delete or self.args.open:
+                if self.args.add:
+                    key = 'a'
+                if self.args.delete:
+                    key = 'd'
+                if self.args.open:
+                    key = 'o'
+            else:
+                Display.title(title='Edit Options')
+                Display.dataframe(
+                    headers=['Action', 'keys'],
+                    rows=[
+                        ('Add', 'a/A'),
+                        ('Delete', 'd/D'),
+                        ('Open', 'o/O'),
+                        ('Quit', 'Any Other keys'),
+                    ]
+                )
+                key = input()
+
             if key in ['a', 'A']:
-                Display.warnings(what='Adding to links ', info='[ Not Available Yet ]')
+                Display.info(what='Adding New Record in table "{0}" '.format(config.TABLES['links']), info=' [ Provide command and link ]')
+                while True:
+                    command = input('Command?\t')
+                    link = input('link?\t')
+                    if command and link:
+                        print('Got enough information to add link??')
+                        break
+                    else:
+                        while not command or not link:
+                            if command:
+                                link = input('link?\t')
+                            else:
+                                command = input('Command?\t')
+                        print('Got enough information to add link??')
+                        break
+                Display.success(what='Adding New Record in table "{0}" '.format(config.TABLES['links']), info=' [ Success ]')
+                # continue
             elif key in ['d', 'D']:
-                Display.info('Deleting Row ', info='[Type Row No.]')
+                Display.info('Deleting Row ', info='[ Type Row No.]')
                 row = input()
                 self.delete_row(table=config.TABLES['links'], records=records, row=row)
+            elif key in ['o', 'O']:
+                Display.info('Opening link/links ', info=' [ Not Implemented Yet]')
             else:
-                Display.info(what='Editing ', info='[ Leaving ]')
+                Display.info(what='Editing ', info=' [ Leaving ]')
                 break
+
+            # Redislay records
+            records = self.__record(table=config.TABLES['links'])
+            self.__display_links_for_edit(table=config.TABLES['links'], records=records)
 
     def edit(self):
         if self.args.links:

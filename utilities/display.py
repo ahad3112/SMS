@@ -2,8 +2,8 @@ from colorama import Fore, Back, Style
 
 
 class Display:
-    line_width = 130
-    msg_width = 115
+    line_width = 150
+    msg_width = 100
     info_width = line_width - msg_width
     header_height = 5
 
@@ -90,19 +90,19 @@ class Display:
 
     @staticmethod
     def info(what='', info='W'):
-        print('{0:-<{1}} : {2:>{3}}'.format(what, Display.msg_width, info, Display.info_width))
+        print('{0:><{1}}{2:>>{3}}'.format(what, Display.msg_width, info, Display.info_width))
 
     @staticmethod
-    def success(what='', info='✓', end='\n'):
+    def success(what='', info='✓'):
         # info = Style.BRIGHT + Fore.YELLOW + info + Style.RESET_ALL
-        print('{0:><{1}} : {2:>{3}}'.format(what, Display.msg_width, info, Display.info_width), end=end)
+        print('{0:><{1}}{2:>>{3}}'.format(what, Display.msg_width, info, Display.info_width))
 
     @staticmethod
     def warning(what='', info='W'):
-        info = Style.BRIGHT + Fore.YELLOW + info + Style.RESET_ALL
-        print('{0:-<{1}} : {2:>{3}}'.format(what, Display.msg_width, info, Display.info_width))
+        # info = Style.BRIGHT + Fore.YELLOW + info + Style.RESET_ALL
+        print('{0:><{1}}{2:>>{3}}'.format(what, Display.msg_width, info, Display.info_width))
 
     @staticmethod
     def fail(what='', info='X'):
         info = Style.BRIGHT + Fore.YELLOW + info + Style.RESET_ALL
-        print('{0:><{1}} : {2:>{3}}'.format(what, Display.msg_width, info, Display.info_width))
+        print('{0:><{1}}{2:>>{3}}'.format(what, Display.msg_width, info, Display.info_width))
