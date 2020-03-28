@@ -42,7 +42,7 @@ class Database:
         except FileNotFoundError:
             print(Display.fail(config.DB_NAME, info='[ DOES NOT EXIST ]'))
         else:
-            Display.success(what='Deleting DB: {0} '.format(config.DB_NAME), info='[ SUCCESS ]')
+            Display.success(what='Deleting DB: {0} '.format(config.DB_NAME), info=' [ SUCCESS ]')
 
     def drop(self, *, args):
         if args.table:

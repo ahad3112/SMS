@@ -31,61 +31,68 @@ class Session:
 
         return sessions
 
-    def save(self):
-        # get all opened tabs
+    def __save_links(self):
         cmd = "/usr/bin/osascript -e 'tell application \"{0}\"' -e 'get URL of every tab of every window' -e 'end tell'"
         links = {}
 
-        # TODO : Remove This methods from here ...
+        total_links = 0
         for browser in config.SUPPORTED_BROWSERS:
             pipe = Popen(cmd.format(browser), stdout=PIPE, shell=True)
             links[browser] = pipe.communicate()[0].strip().split(b',')
+            total_links += len(links[browser])
 
         # saving all opened tabs along with session name, open command
         sql_string = 'insert into {0} values(?,?,?)'.format(config.TABLES['links'])
 
-        # Pringint progress bar
+        # variable related to diplaying progress bar
+        progress_bar_step = 0
+        percentage_step_length = 100 // total_links
+
         from time import sleep
-        print('{0:^{1}}'.format(' Saving Links ', 130))
-        # step = 100 // len(links)
-        step = 4
-        current = step
-        progress_bar = '[{0:<{1}}]{2:>{3}}%'
+        Display.title(title='Saving "links" under session: "{0}"'.format(self.name))
 
         for browser in config.SUPPORTED_BROWSERS:
-            for link in links[browser]:
-                if link:
-                    # Checking whether there is any record for the session, command and args
-                    query_string = 'select * from {0} where session=? and command=? and links=?'.format(config.TABLES['links'])
-                    self.db.query(table=config.TABLES['links'], query_string=query_string, values=(self.name, config.SUPPORTED_BROWSERS[browser], link))
-                    query_length = len(self.db.cursor.fetchall())
-                    if query_length == 1:
-                        break
-                    elif query_length > 1:
-                        raise AssertionError('Multiple same entry for the Session: "{0}"'.format(self.name))
+            browser_links = links.get(browser, None)
+            if browser_links:
+                for link in browser_links:
+                    if link:
+                        # Checking whether there is any record for the session, command and args
+                        query_string = 'select * from {0} where session=? and command=? and links=?'.format(config.TABLES['links'])
+                        self.db.query(table=config.TABLES['links'], query_string=query_string, values=(self.name, config.SUPPORTED_BROWSERS[browser], link.strip().decode()))
+                        query_length = len(self.db.cursor.fetchall())
+                        if query_length == 1:
+                            # Display.info(what='Adding : {0}'.format(link.strip().decode()), info=' [ Already Exists]')
+                            pass
+                        elif query_length > 1:
+                            raise AssertionError('Multiple same entry for the Session: "{0}"'.format(self.name))
 
-                    # save unique entry
-                    self.db.update(
-                        table=config.TABLES['links'],
-                        sql_string=sql_string,
-                        values=(self.name, config.SUPPORTED_BROWSERS[browser], link.strip().decode()),
-                        commit=True,
-                        create_if_required=True
+                        else:
+                            # save unique entry
+                            self.db.update(
+                                table=config.TABLES['links'],
+                                sql_string=sql_string,
+                                values=(self.name, config.SUPPORTED_BROWSERS[browser], link.strip().decode()),
+                                commit=True,
+                                create_if_required=True
+                            )
+                    progress_bar_step += 1
+                    Display.progress_bar(
+                        total=total_links,
+                        step=progress_bar_step,
+                        completed=str(percentage_step_length * progress_bar_step) + '%'
                     )
+                    # For testing
+                    # sleep(.2)
 
-                    # Pringint progress bar
-                    progress = progress_bar.format('=' * (current - 1) + '>', 124, current, 4)
-                    Display.success(what=progress, info='{}%'.format(current), end='')
-                    # sys.stdout.write(progress)
-                    sys.stdout.flush()
-                    sys.stdout.write('\r')
-                    current += step
+        Display.progress_bar(total=total_links, step=progress_bar_step + 1, completed='100%')
+        print()
 
-        progress = progress_bar.format('=' * 124, 124, 100, 4)
-        Display.success(what=progress, info='{}%'.format(100), end='')
-        # sys.stdout.write(progress)
-        sys.stdout.write('\n')
-        sys.stdout.flush()
+    def save(self):
+        if self.args.links:
+            self.__save_links()
+        elif self.args.all:
+            self.__save_links()
+            #  Add all other apps
 
     def open(self):
         query_string = 'select * from {0} where session = ?'.format(config.TABLES['links'])
@@ -127,8 +134,6 @@ class Session:
         )
 
     def __edit_links(self):
-        records = self.__record(table=config.TABLES['links'])
-        self.__display_links_for_edit(table=config.TABLES['links'], records=records)
 
         while True:
             if self.args.add or self.args.delete or self.args.open:
@@ -170,6 +175,8 @@ class Session:
                 Display.success(what='Adding New Record in table "{0}" '.format(config.TABLES['links']), info=' [ Success ]')
                 # continue
             elif key in ['d', 'D']:
+                records = self.__record(table=config.TABLES['links'])
+                self.__display_links_for_edit(table=config.TABLES['links'], records=records)
                 Display.info('Deleting Row ', info='[ Type Row No.]')
                 row = input()
                 self.delete_row(table=config.TABLES['links'], records=records, row=row)
@@ -192,6 +199,12 @@ class Session:
     def delete_row(self, *, table, records, row):
         sql_string = 'delete from {0} where session = ? and command = ? and links = ?'.format(table)
         for (idx, record) in enumerate(records):
-            if idx == int(row):
-                self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=record, commit=True)
+            try:
+                idx_to_delete == int(row)
+            except Exception:
+                Display.warning(what='Wrong Input ', info=' [ Integer Required ]')
                 break
+            else:
+                if idx == idx_to_delete:
+                    self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=record, commit=True)
+                    break

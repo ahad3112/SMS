@@ -1,9 +1,10 @@
 from colorama import Fore, Back, Style
+import sys
 
 
 class Display:
     line_width = 150
-    msg_width = 100
+    msg_width = 140
     info_width = line_width - msg_width
     header_height = 5
 
@@ -86,19 +87,38 @@ class Display:
         print('-' * Display.line_width)
         print(title)
         print('-' * Display.line_width)
-        print()
+
+    @staticmethod
+    def progress_bar(*, total, step, completed):
+        step_length = (Display.msg_width - 2) // total
+        progress_bar_format = '[{0:<{1}}]{2:>{3}}'
+        sys.stdout.write('\r')
+        if completed.startswith('100'):
+            sys.stdout.write(progress_bar_format.format(
+                '=' * (Display.msg_width - 2),
+                Display.msg_width - 2,
+                completed,
+                Display.info_width)
+            )
+        else:
+            sys.stdout.write(progress_bar_format.format(
+                '=' * (step_length * step - 1) + '>',
+                Display.msg_width - 2,
+                completed,
+                Display.info_width)
+            )
 
     @staticmethod
     def info(what='', info='W'):
         print('{0:><{1}}{2:>>{3}}'.format(what, Display.msg_width, info, Display.info_width))
 
     @staticmethod
-    def success(what='', info='✓'):
+    def success(what='', info='✓', end='\n'):
         # info = Style.BRIGHT + Fore.YELLOW + info + Style.RESET_ALL
-        print('{0:><{1}}{2:>>{3}}'.format(what, Display.msg_width, info, Display.info_width))
+        print('{0:><{1}}{2:>>{3}}'.format(what, Display.msg_width, info, Display.info_width), end=end)
 
     @staticmethod
-    def warning(what='', info='W'):
+    def warning(what='', info='W', end='\n'):
         # info = Style.BRIGHT + Fore.YELLOW + info + Style.RESET_ALL
         print('{0:><{1}}{2:>>{3}}'.format(what, Display.msg_width, info, Display.info_width))
 

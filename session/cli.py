@@ -79,9 +79,19 @@ class SessionCLI:
                         name=('-l', '--links',),
                         type=str,
                         help='Saves links',
-                        action='store_true'
+                        action='store_true',
+                        group='save_option'
                     ),
-                ]),
+                    Argument(
+                        name=('-a', '--all',),
+                        type=str,
+                        help='Saves all opening process',
+                        action='store_true',
+                        group='save_option'
+                    ),
+                ],
+                mutually_exclusive_group={'save_option': None}
+                ),
     ]
 
     def __init__(self, *, sub_parsers, name='session'):

@@ -21,11 +21,3 @@ DB_TABLES = {
 SUPPORTED_BROWSERS = {'Google Chrome': 'open -a Google\\ Chrome ',
                       'Safari': 'open -a Safari ',
                       }
-
-# For testing
-# SUPPORTED_BROWSERS = {
-#     'Safari': b'open -a Safari ',
-# }
-
-# session's action
-# SESSION_ACTIONS = ('save', 'open', 'view', 'edit')
