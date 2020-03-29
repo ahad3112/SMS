@@ -61,11 +61,9 @@ class Session:
                         self.db.query(table=config.TABLES['links'], query_string=query_string, values=(self.name, config.SUPPORTED_BROWSERS[browser], link.strip().decode()))
                         query_length = len(self.db.cursor.fetchall())
                         if query_length == 1:
-                            # Display.info(what='Adding : {0}'.format(link.strip().decode()), info=' [ Already Exists]')
                             pass
                         elif query_length > 1:
                             raise AssertionError('Multiple same entry for the Session: "{0}"'.format(self.name))
-
                         else:
                             # save unique entry
                             self.db.update(
@@ -190,21 +188,43 @@ class Session:
             records = self.__record(table=config.TABLES['links'])
             self.__display_links_for_edit(table=config.TABLES['links'], records=records)
 
+    def __delete(self, *, table):
+        while True:
+            records = self.__record(table=table)
+            self.__display_links_for_edit(table=table, records=records)
+            Display.info('Deleting Row ', info=' [ Type Row No.]')
+            confirmation = input()
+            if confirmation.isdigit():
+                # add row deletion logic
+                row = int(confirmation)
+                self.delete_row(table=config.TABLES['links'], records=records, row=row)
+                Display.info('Row {0} '.format(confirmation), info=' [ DELETED ]')
+            else:
+                Display.info(what='Wrong Choice ', info=' [ Leaving Editing]')
+                break
+
     def edit(self):
-        if self.args.links:
-            self.__edit_links()
-        else:
+        if self.args.add:
+            # Adding
             pass
+        if self.args.delete:
+            # deleting
+            if self.args.links:
+                self.__delete(table=config.TABLES['links'])
+            else:
+                pass
+        if self.args.open:
+            # open
+            pass
+
+        # if self.args.links:
+        #     self.__edit_links()
+        # else:
+        #     pass
 
     def delete_row(self, *, table, records, row):
         sql_string = 'delete from {0} where session = ? and command = ? and links = ?'.format(table)
         for (idx, record) in enumerate(records):
-            try:
-                idx_to_delete == int(row)
-            except Exception:
-                Display.warning(what='Wrong Input ', info=' [ Integer Required ]')
+            if idx == row:
+                self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=record, commit=True)
                 break
-            else:
-                if idx == idx_to_delete:
-                    self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=record, commit=True)
-                    break

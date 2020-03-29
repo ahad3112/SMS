@@ -4,7 +4,7 @@ import sys
 
 class Display:
     line_width = 150
-    msg_width = 140
+    msg_width = 130
     info_width = line_width - msg_width
     header_height = 5
 
@@ -85,7 +85,7 @@ class Display:
     def title(*, title):
         title = '{0: ^{1}}'.format(title, Display.line_width)
         print('-' * Display.line_width)
-        print(title)
+        print(''.join(x.upper() for x in title))
         print('-' * Display.line_width)
 
     @staticmethod

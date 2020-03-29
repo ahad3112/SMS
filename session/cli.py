@@ -48,24 +48,38 @@ class SessionCLI:
                     Argument(
                         name=('-l', '--links',),
                         help='Choose links list to be Edited.',
-                        action='store_true'
+                        action='store_true',
+                        group='apps'
+                    ),
+                    Argument(
+                        name=('-s', '--shell',),
+                        help='Choose Shell list to be Edited.',
+                        action='store_true',
+                        group='apps'
                     ),
                     Argument(
                         name=('-a', '--add',),
                         help='add link/links',
-                        action='store_true'
+                        action='store_true',
+                        group='edit_option'
                     ),
                     Argument(
                         name=('-d', '--delete',),
                         help='Delete link/links',
-                        action='store_true'
+                        action='store_true',
+                        group='edit_option'
                     ),
                     Argument(
                         name=('-o', '--open',),
                         help='Open link/links',
-                        action='store_true'
+                        action='store_true',
+                        group='edit_option'
                     ),
-                ]),
+                ],
+                mutually_exclusive_group={
+                    'edit_option': None,
+                    'apps': None,
+                }),
         Command(name='save',
                 help='saves current session',
                 description='This module will save the current session',
