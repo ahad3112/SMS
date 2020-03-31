@@ -83,9 +83,9 @@ class Display:
 
     @staticmethod
     def title(*, title):
-        title = '{0: ^{1}}'.format(title, Display.line_width)
         print('-' * Display.line_width)
-        print(''.join(x.upper() for x in title))
+        title = '{0!s:^{1}}'.format(' '.join(x.upper() for x in title), Display.line_width)
+        print(title)
         print('-' * Display.line_width)
 
     @staticmethod

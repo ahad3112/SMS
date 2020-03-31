@@ -87,7 +87,8 @@ class SessionCLI:
                     Argument(
                         name=('-n', '--name'),
                         type=str,
-                        help='Later'
+                        help='Later',
+                        required=True
                     ),
                     Argument(
                         name=('-l', '--links',),
@@ -97,9 +98,9 @@ class SessionCLI:
                         group='save_option'
                     ),
                     Argument(
-                        name=('-a', '--all',),
+                        name=('-s', '--shell',),
                         type=str,
-                        help='Saves all opening process',
+                        help='Saves all opening shell process',
                         action='store_true',
                         group='save_option'
                     ),

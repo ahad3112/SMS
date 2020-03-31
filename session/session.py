@@ -32,6 +32,7 @@ class Session:
         return sessions
 
     def __save_links(self):
+        Display.title(title='Saving links to : {0}'.format(self.name))
         cmd = "/usr/bin/osascript -e 'tell application \"{0}\"' -e 'get URL of every tab of every window' -e 'end tell'"
         links = {}
 
@@ -49,7 +50,6 @@ class Session:
         percentage_step_length = 100 // total_links
 
         from time import sleep
-        Display.title(title='Saving "links" under session: "{0}"'.format(self.name))
 
         for browser in config.SUPPORTED_BROWSERS:
             browser_links = links.get(browser, None)
@@ -216,11 +216,6 @@ class Session:
         if self.args.open:
             # open
             pass
-
-        # if self.args.links:
-        #     self.__edit_links()
-        # else:
-        #     pass
 
     def delete_row(self, *, table, records, row):
         sql_string = 'delete from {0} where session = ? and command = ? and links = ?'.format(table)
