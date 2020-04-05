@@ -42,7 +42,7 @@ class SessionCLI:
                     Argument(
                         name=('-n', '--name',),
                         type=str,
-                        help='Later',
+                        help='Name of the Session to edit',
                         required=True
                     ),
                     Argument(
@@ -59,19 +59,13 @@ class SessionCLI:
                     ),
                     Argument(
                         name=('-a', '--add',),
-                        help='add link/links',
+                        help='Add an entry',
                         action='store_true',
                         group='edit_option'
                     ),
                     Argument(
                         name=('-d', '--delete',),
-                        help='Delete link/links',
-                        action='store_true',
-                        group='edit_option'
-                    ),
-                    Argument(
-                        name=('-o', '--open',),
-                        help='Open link/links',
+                        help='Delete an entry',
                         action='store_true',
                         group='edit_option'
                     ),
@@ -101,6 +95,13 @@ class SessionCLI:
                         name=('-s', '--shell',),
                         type=str,
                         help='Saves all opening shell process',
+                        action='store_true',
+                        group='save_option'
+                    ),
+                    Argument(
+                        name=('-a', '--all',),
+                        type=str,
+                        help='Saves all opening process',
                         action='store_true',
                         group='save_option'
                     ),

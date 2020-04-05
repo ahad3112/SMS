@@ -192,30 +192,56 @@ class Session:
         while True:
             records = self.__record(table=table)
             self.__display_links_for_edit(table=table, records=records)
-            Display.info('Deleting Row ', info=' [ Type Row No.]')
+            Display.info('Type Row no to delete ', info=' [ q/Q to Quit]')
             confirmation = input()
             if confirmation.isdigit():
                 # add row deletion logic
                 row = int(confirmation)
                 self.delete_row(table=config.TABLES['links'], records=records, row=row)
-                Display.info('Row {0} '.format(confirmation), info=' [ DELETED ]')
-            else:
-                Display.info(what='Wrong Choice ', info=' [ Leaving Editing]')
+                # Display.title(title='Row {0} Deletion was successfull'.format(confirmation))
+                Display.info('Row {0} Deletion '.format(confirmation), info=' [ SUCCESS ]')
+                print()
+            elif confirmation in ['q', 'Q']:
+                Display.info(what='You chose to Quit ', info=' [ Leaving]')
                 break
+
+    def __add(self, *, table):
+        while True:
+            Display.info('Input format ', info=' [ [command1,args1, ...] ]')
+            user_input = input().split(',')
+            if len(user_input) >= 2 and len(user_input) % 2 == 0:
+                for idx in range(0, len(user_input), 2):
+                    command = user_input[idx].strip()
+                    args = user_input[idx + 1].strip()
+                    sql_string = 'insert into {0} values(?,?,?)'.format(table)
+                    # Need to check double entry....Write a method to be used in both here and in save module
+                    self.db.update(
+                        table=table,
+                        sql_string=sql_string,
+                        values=(self.name, command, args),
+                        commit=True,
+                        create_if_required=False
+                    )
+                Display.info('Addition ', info=' [ Success ]')
+            elif len(user_input) == 1 and user_input[0].strip() in ['q', 'Q']:
+                Display.info(what='You chose to Quit ', info=' [ Leaving]')
+                break
+            else:
+                Display.warning('Wrong input ', info=' [ Try Again ]')
 
     def edit(self):
         if self.args.add:
             # Adding
-            pass
+            if self.args.links:
+                self.__add(table=config.TABLES['links'])
+            else:
+                pass
         if self.args.delete:
             # deleting
             if self.args.links:
                 self.__delete(table=config.TABLES['links'])
             else:
                 pass
-        if self.args.open:
-            # open
-            pass
 
     def delete_row(self, *, table, records, row):
         sql_string = 'delete from {0} where session = ? and command = ? and links = ?'.format(table)

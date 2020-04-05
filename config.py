@@ -1,13 +1,12 @@
 import os
-
-# Debug option
-DEBUG = False
+import sys
 
 # Working directory
 WORKING_DIR = os.getcwd()
+HOME_DIR = os.path.split(sys.argv[0])[0]
 
 # database
-DB_NAME = os.path.join(WORKING_DIR, 'sms.db')
+DB_NAME = os.path.join(HOME_DIR, 'sms.db')
 
 TABLES = {
     'links': 'links',
