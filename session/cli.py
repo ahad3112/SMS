@@ -52,7 +52,7 @@ class SessionCLI:
                         group='apps'
                     ),
                     Argument(
-                        name=('-s', '--shell',),
+                        name=('-s', '--shells',),
                         help='Choose Shell list to be Edited.',
                         action='store_true',
                         group='apps'

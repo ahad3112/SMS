@@ -40,13 +40,14 @@ def cli():
 
     DatabaseCLI(sub_parsers=sub_parsers)
     SessionCLI(sub_parsers=sub_parsers)
-    return parser.parse_args()
+
+    return parser, parser.parse_args()
 
 
-def action(*, args, db):
+def action(*, parser, args, db):
     if len(sys.argv) >= 3:
         if sys.argv[1] == 'session':
-            Session(name=args.name, subcommand=sys.argv[2], args=args, db=db)
+            Session(name=args.name, subcommand=sys.argv[2], parser=parser, args=args, db=db)
         elif sys.argv[1] == 'db':
             getattr(db, sys.argv[2])(args=args)
 
@@ -54,5 +55,5 @@ def action(*, args, db):
 if __name__ == '__main__':
     # Database instance object
     db = Database()
-    args = cli()
-    action(args=args, db=db)
+    parser, args = cli()
+    action(parser=parser, args=args, db=db)

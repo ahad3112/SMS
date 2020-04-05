@@ -10,8 +10,9 @@ from utilities.display import Display
 
 class Session:
 
-    def __init__(self, *, name=None, subcommand, args, db=None):
+    def __init__(self, *, name=None, subcommand, parser, args, db=None):
         self.name = name if name else '{0}-{1}'.format(os.environ['USER'], str(date.today()))
+        self.parser = parser
         self.args = args
 
         self.db = db
@@ -230,6 +231,7 @@ class Session:
                 Display.warning('Wrong input ', info=' [ Try Again ]')
 
     def edit(self):
+        self.__opt_args_check(['links', 'shells'])
         if self.args.add:
             # Adding
             if self.args.links:
@@ -249,3 +251,8 @@ class Session:
             if idx == row:
                 self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=record, commit=True)
                 break
+
+    # Optional arguments checking
+    def __opt_args_check(self, attrs):
+        if not any(getattr(self.args, attr) for attr in attrs):
+            raise self.parser.error(message='Missing one of the optional argument from {0}'.format(['-' + x[0] for x in attrs]))
