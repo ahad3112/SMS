@@ -206,36 +206,39 @@ class Session:
                 Display.info(what='You chose to Quit ', info=' [ Leaving]')
                 break
 
-    def __add(self, *, table):
+    def __add(self, *, table, commands):
+        Display.title(title='Adding to table "{0}" for Session "{1}"'.format(table, self.name))
         while True:
-            Display.info('Input format ', info=' [ [command1,args1, ...] ]')
+            Display.info('Input format: [ "{0}" args1 args2, "{0}" args1 args2 ... ] '.format('|'.join(commands.keys())), info=' [ Waiting ]')
             user_input = input().split(',')
-            if len(user_input) >= 2 and len(user_input) % 2 == 0:
-                for idx in range(0, len(user_input), 2):
-                    command = user_input[idx].strip()
-                    args = user_input[idx + 1].strip()
-                    sql_string = 'insert into {0} values(?,?,?)'.format(table)
-                    # Need to check double entry....Write a method to be used in both here and in save module
-                    self.db.update(
-                        table=table,
-                        sql_string=sql_string,
-                        values=(self.name, command, args),
-                        commit=True,
-                        create_if_required=False
-                    )
-                Display.info('Addition ', info=' [ Success ]')
-            elif len(user_input) == 1 and user_input[0].strip() in ['q', 'Q']:
-                Display.info(what='You chose to Quit ', info=' [ Leaving]')
+            if user_input[0].strip() in ['q', 'Q']:
+                Display.info(what='You have chosen to Quit ', info=' [ Leaving ]')
                 break
             else:
-                Display.warning('Wrong input ', info=' [ Try Again ]')
+                sql_string = 'insert into {0} values(?,?,?)'.format(table)
+                for entry in user_input:
+                    command_for, *args = [x.strip() for x in entry.split()]
+                    if not command_for in commands.keys():
+                        Display.info(what='Wrong input : {0}, available are '.format(command_for),
+                                     info=' [ {0} ]'.format('|'.join(commands.keys())))
+                    else:
+                        for arg in args:
+                            self.db.update(
+                                table=table,
+                                sql_string=sql_string,
+                                values=(self.name, commands[command_for], arg),
+                                commit=True,
+                                create_if_required=False
+                            )
+                            Display.success('Addition of {0} : {1} '.format(command_for, arg), info=' [ Success ]')
 
     def edit(self):
-        self.__opt_args_check(['links', 'shells'])
+        self.__opt_flags_check(['links', 'shells'])
+        self.__opt_flags_check(['add', 'delete'])
         if self.args.add:
             # Adding
             if self.args.links:
-                self.__add(table=config.TABLES['links'])
+                self.__add(table=config.TABLES['links'], commands=config.SUPPORTED_BROWSERS)
             else:
                 pass
         if self.args.delete:
@@ -253,6 +256,6 @@ class Session:
                 break
 
     # Optional arguments checking
-    def __opt_args_check(self, attrs):
+    def __opt_flags_check(self, attrs):
         if not any(getattr(self.args, attr) for attr in attrs):
             raise self.parser.error(message='Missing one of the optional argument from {0}'.format(['-' + x[0] for x in attrs]))
