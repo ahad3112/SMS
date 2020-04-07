@@ -3,7 +3,7 @@ import sys
 
 
 class Display:
-    line_width = 165
+    line_width = 161
     msg_width = 120
     info_width = line_width - msg_width
     header_height = 5
@@ -12,15 +12,13 @@ class Display:
     def dataframe(*, headers, rows):
         try:
             # Extra one is required for row number
-            min_column_width = self.line_width // (len(headers) + 1)
+            min_column_width = Display.line_width // (len(rows[0]) + 1)
         except Exception:
-            try:
-                # Extra one is required for row number
-                min_column_width = Display.line_width // (len(rows[0]) + 1)
-            except Exception:
-                print('No Header of Data was provided for display.....')
-        finally:
-            remaining_line_width = Display.line_width - min_column_width
+            Display.info(what='No record available to display', info=' [RETURNING]')
+            return
+        else:
+            # Leave the remaining_line_width
+            remaining_line_width = Display.line_width - min_column_width * (len(rows[0]) + 1)
             column_format = '{0!s:{1}<{2}}'
             headers.insert(0, 'No.')
             # headers
@@ -40,7 +38,7 @@ class Display:
                     print(column_format.format(column[:min_column_width + 1], '', min_column_width), end='')
                 print('\r')
 
-        print('\n** Some column might have been truncated to fit in the column width.')
+        print('\n*** Some column might have been truncated to fit in the column width.')
 
     @staticmethod
     def list_data(*, headers=None, data):
@@ -125,5 +123,4 @@ class Display:
 
     @staticmethod
     def fail(what='', info='X'):
-        info = Style.BRIGHT + Fore.YELLOW + info + Style.RESET_ALL
         print('{0:><{1}}{2:>>{3}}'.format(what, Display.msg_width, info, Display.info_width))

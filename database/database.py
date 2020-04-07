@@ -124,4 +124,4 @@ class Database:
             else:
                 self.cursor.execute(query_string)
         else:
-            Display.fail(what='Query on table {0} '.format(table), info='[ NOT EXIST ]')
+            Display.fail(what='Query on table "{0}" '.format(table), info='[ NOT EXIST ]')

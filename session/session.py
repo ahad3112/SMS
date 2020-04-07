@@ -193,6 +193,9 @@ class Session:
         while True:
             records = self.__record(table=table)
             self.__display_links_for_edit(table=table, records=records)
+            if not records:
+                Display.info(what='No record available to delete for {0} '.format(self.name), info=' [QUITING]')
+                break
             Display.info('Type Row no to delete ', info=' [ q/Q to Quit]')
             confirmation = input()
             if confirmation.isdigit():
@@ -200,7 +203,7 @@ class Session:
                 row = int(confirmation)
                 self.delete_row(table=config.TABLES['links'], records=records, row=row)
                 # Display.title(title='Row {0} Deletion was successfull'.format(confirmation))
-                Display.info('Row {0} Deletion '.format(confirmation), info=' [ SUCCESS ]')
+                Display.info(what='Row {0} Deletion '.format(confirmation), info=' [ SUCCESS ]')
                 print()
             elif confirmation in ['q', 'Q']:
                 Display.info(what='You chose to Quit ', info=' [ Leaving]')
@@ -209,10 +212,10 @@ class Session:
     def __add(self, *, table, commands):
         Display.title(title='Adding to table "{0}" for Session "{1}"'.format(table, self.name))
         while True:
-            Display.info('Input format: [ "{0}" args1 args2, "{0}" args1 args2 ... ] '.format('|'.join(commands.keys())), info=' [ Waiting ]')
+            Display.info('INPUT FORMAT: [ "{0}" args1 args2, "{0}" args1 args2 ... ] '.format('|'.join(commands.keys())), info=' [ q/Q to delete ]')
             user_input = input().split(',')
             if user_input[0].strip() in ['q', 'Q']:
-                Display.info(what='You have chosen to Quit ', info=' [ Leaving ]')
+                Display.info(what='You have chosen to Quit ', info=' [ QUITING ]')
                 break
             else:
                 sql_string = 'insert into {0} values(?,?,?)'.format(table)
