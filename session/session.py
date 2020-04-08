@@ -94,11 +94,15 @@ class Session:
             #  Add all other apps
 
     def open(self):
-        query_string = 'select * from {0} where session = ?'.format(config.TABLES['links'])
-        self.db.query(table=config.TABLES['links'], query_string=query_string, values=[self.name])
+        self.__opt_flags_check(['links', 'shells'])
+        if self.args.links:
+            query_string = 'select * from {0} where session = ?'.format(config.TABLES['links'])
+            self.db.query(table=config.TABLES['links'], query_string=query_string, values=[self.name])
 
-        for (name, command, args) in self.db.cursor.fetchall():
-            call(command + args, shell=True)
+            for (name, command, args) in self.db.cursor.fetchall():
+                call(command + args, shell=True)
+        else:
+            Display.info(what='Opening all saved shell process ', info=' [ NOT IMPLEMENTED YET ]')
 
     def __record(self, *, table):
         query_string = 'select * from {0} where session = ?'.format(
@@ -109,21 +113,33 @@ class Session:
         return self.db.cursor.fetchall()
 
     def view(self, *pargs, **kwargs):
-        if self.args.all_sessions:
-            sessions = self.__all_sessions(tables=config.TABLES.values())
-            Display.dataframe(
-                headers=['Table Name', 'List of Session'],
-                rows=sessions
-            )
-        elif self.args.name:
+        self.__opt_flags_check(['links', 'shells'])
+        if self.args.links:
             headers = ['Command', 'Arguments']
-            for table in config.TABLES.values():
-                Display.title(title='Record for Session : {0} , Table: {1}'.format(self.name, table))
-                records = self.__record(table=table)
-                Display.dataframe(
-                    headers=headers,
-                    rows=[(cmd, arg) for (sess, cmd, arg) in records]
-                )
+            Display.title(title='Record for Session : {0} , Table: {1}'.format(self.name, config.TABLES['links']))
+            records = self.__record(table=config.TABLES['links'])
+            Display.dataframe(
+                headers=headers,
+                rows=[(cmd, arg) for (sess, cmd, arg) in records]
+            )
+        else:
+            Display.info(what='Viewing all saved shell process ', info=' [ NOT IMPLEMENTED YET ]')
+
+        # if self.args.all_sessions:
+        #     sessions = self.__all_sessions(tables=config.TABLES.values())
+        #     Display.dataframe(
+        #         headers=['Table Name', 'List of Session'],
+        #         rows=sessions
+        #     )
+        # elif self.args.name:
+        #     headers = ['Command', 'Arguments']
+        #     for table in config.TABLES.values():
+        #         Display.title(title='Record for Session : {0} , Table: {1}'.format(self.name, table))
+        #         records = self.__record(table=table)
+        #         Display.dataframe(
+        #             headers=headers,
+        #             rows=[(cmd, arg) for (sess, cmd, arg) in records]
+        #         )
 
     def __display_links_for_edit(self, table, records):
         Display.title(title='Record for Session : {0}, Table: {1}'.format(self.name, table))

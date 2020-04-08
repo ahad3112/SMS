@@ -14,7 +14,22 @@ class SessionCLI:
                         help='Later',
                         required=True
                     ),
-                ]),
+                    Argument(
+                        name=('-l', '--links',),
+                        type=str,
+                        help='Saves links',
+                        action='store_true',
+                        group='apps'
+                    ),
+                    Argument(
+                        name=('-s', '--shells',),
+                        type=str,
+                        help='Saves all opening shell process',
+                        action='store_true',
+                        group='apps'
+                    ),
+                ],
+                mutually_exclusive_group={'apps': None}),
         Command(name='view',
                 help='view a saved session',
                 description='This module display saved session using the session name',
@@ -27,14 +42,27 @@ class SessionCLI:
                         required=False
                     ),
                     Argument(
-                        name=('-as', '--all-sessions',),
-                        help='Display all sessions from the database.',
+                        name=('-l', '--links',),
+                        help='Choose links list to be Edited.',
                         action='store_true',
-                        group='view_option',
-                        required=False
+                        group='apps'
                     ),
+                    Argument(
+                        name=('-s', '--shells',),
+                        help='Choose Shell list to be Edited.',
+                        action='store_true',
+                        group='apps'
+                    ),
+                    # The following should be moved to db module
+                    # Argument(
+                    #     name=('-as', '--all-sessions',),
+                    #     help='Display all sessions from the database.',
+                    #     action='store_true',
+                    #     group='view_option',
+                    #     required=False
+                    # ),
                 ],
-                mutually_exclusive_group={'view_option': None}),
+                mutually_exclusive_group={'apps': None}),
         Command(name='edit',
                 help='edit a saved session',
                 description='This module helps edit a saved session',
