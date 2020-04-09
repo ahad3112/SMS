@@ -192,23 +192,33 @@ class Session:
                                 commit=True,
                                 create_if_required=False
                             )
-                            Display.success('Addition of {0} : {1} '.format(command_for, arg), info=' [ Success ]')
+                            Display.success('Addition of {0} : {1} '.format(command_for, arg), info=' [ SUCCESS ]')
 
     def edit(self):
         self.__opt_flags_check(['links', 'shells'])
-        self.__opt_flags_check(['add', 'delete'])
+        self.__opt_flags_check(['add', 'delete', 'delete_all'])
         if self.args.add:
             # Adding
             if self.args.links:
                 self.__add(table=config.TABLES['links'], commands=config.SUPPORTED_BROWSERS)
             else:
                 pass
-        if self.args.delete:
+        elif self.args.delete:
             # deleting
             if self.args.links:
                 self.__delete(table=config.TABLES['links'])
             else:
                 pass
+        elif self.args.delete_all:
+            # deleting all entry of link/shell apps for session name
+            if self.args.links:
+                Display.title(title='Deleting entries from table "{0}" for Session "{1}"'.format(config.TABLES['links'], self.name))
+                sql_string = 'delete from {table} where session = ?'.format(table=config.TABLES['links'])
+                self.db.update(table=config.TABLES['links'], sql_string=sql_string, values=(self.name, ), commit=True)
+            else:
+                pass
+
+            Display.success('Deletion was ', info=' [ SUCCESS ]')
 
     def delete_row(self, *, table, records, row):
         sql_string = 'delete from {0} where session = ? and command = ? and links = ?'.format(table)
@@ -220,4 +230,4 @@ class Session:
     # Optional arguments checking
     def __opt_flags_check(self, attrs):
         if not any(getattr(self.args, attr) for attr in attrs):
-            raise self.parser.error(message='Missing one of the optional argument from {0}'.format(['-' + x[0] for x in attrs]))
+            raise self.parser.error(message='Missing one of the optional argument from {0}'.format(['--' + x.replace('_', '-') for x in attrs]))

@@ -97,6 +97,12 @@ class SessionCLI:
                         action='store_true',
                         group='edit_option'
                     ),
+                    Argument(
+                        name=('--delete-all',),
+                        help='Delete all',
+                        action='store_true',
+                        group='edit_option'
+                    ),
                 ],
                 mutually_exclusive_group={
                     'edit_option': None,
