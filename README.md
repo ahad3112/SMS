@@ -25,8 +25,28 @@
 
 #### submodules of `session`:
 
-* `save` -
-* `open` -
-* `view` -
-* `edit` -
+* `save` - Save a session
+* `open` - Open saved apps for a named session
+* `view` - View all saved apps for a names session
+* `edit` - Edit a named session
+
+###### usafe of `session save`:
+
+    sms session save [-h] -n NAME [-l | -s | -a]
+
+###### usafe of `session open`:
+
+    sms session open [-h] -n NAME [-l | -s]
+
+###### usafe of `session view`:
+
+    sms session view [-h] [-n NAME | --sessions] -l | -s | -a]
+
+###### usafe of `session edit`:
+
+    sms session edit [-h] -n NAME [-l | -s] -a | -d | --delete-all]
+
+
+## More information can be available on usage for each module using the `-h` argument.
+
 
