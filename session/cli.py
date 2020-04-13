@@ -39,30 +39,34 @@ class SessionCLI:
                         type=str,
                         help='Display all records for this session name.',
                         group='view_option',
-                        required=False
+                    ),
+                    Argument(
+                        name=('--sessions',),
+                        help='Display sessions from the database.',
+                        action='store_true',
+                        group='view_option',
                     ),
                     Argument(
                         name=('-l', '--links',),
-                        help='Choose links list to be Edited.',
+                        help='Consider links table',
                         action='store_true',
                         group='apps'
                     ),
                     Argument(
                         name=('-s', '--shells',),
-                        help='Choose Shell list to be Edited.',
+                        help='Consider shells table',
                         action='store_true',
                         group='apps'
                     ),
-                    # The following should be moved to db module
-                    # Argument(
-                    #     name=('-as', '--all-sessions',),
-                    #     help='Display all sessions from the database.',
-                    #     action='store_true',
-                    #     group='view_option',
-                    #     required=False
-                    # ),
+
+                    Argument(
+                        name=('-a', '--all',),
+                        help='Consider all tables',
+                        action='store_true',
+                        group='apps'
+                    ),
                 ],
-                mutually_exclusive_group={'apps': None}),
+                mutually_exclusive_group={'apps': None, 'view_option': None}),
         Command(name='edit',
                 help='edit a saved session',
                 description='This module helps edit a saved session',

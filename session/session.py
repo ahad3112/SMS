@@ -18,20 +18,6 @@ class Session:
         self.db = db
         getattr(self, subcommand)()
 
-    def __all_sessions(self, *, tables):
-        sessions = []
-        for table in tables:
-            query_string = 'select session from {0}'.format(table)
-            self.db.query(table=table, query_string=query_string)
-            results = [session[0] for session in self.db.cursor.fetchall()]
-            result = list(set(results))
-            if not results:
-                continue
-
-            sessions.append([table, result])
-
-        return sessions
-
     def __save_links(self):
         Display.title(title='Saving links to : {0}'.format(self.name))
         cmd = "/usr/bin/osascript -e 'tell application \"{0}\"' -e 'get URL of every tab of every window' -e 'end tell'"
@@ -112,34 +98,54 @@ class Session:
         self.db.query(table=table, query_string=query_string, values=[self.name])
         return self.db.cursor.fetchall()
 
+    def __all_sessions(self, *, tables):
+        sessions = []
+        for table in tables:
+            query_string = 'select session from {0}'.format(table)
+            self.db.query(table=table, query_string=query_string)
+            results = [session[0] for session in self.db.cursor.fetchall()]
+            result = list(set(results))
+            if not results:
+                continue
+
+            sessions.append([table, result])
+
+        return sessions
+
     def view(self, *pargs, **kwargs):
-        self.__opt_flags_check(['links', 'shells'])
-        if self.args.links:
-            headers = ['Command', 'Arguments']
-            Display.title(title='Record for Session : {0} , Table: {1}'.format(self.name, config.TABLES['links']))
-            records = self.__record(table=config.TABLES['links'])
+        if self.args.name:
+            self.__opt_flags_check(['links', 'shells', 'all'])
+            if self.args.links:
+                headers = ['Command', 'Arguments']
+                Display.title(title='Record for Session : {0} , Table: {1}'.format(self.name, config.TABLES['links']))
+                records = self.__record(table=config.TABLES['links'])
+                Display.dataframe(
+                    headers=headers,
+                    rows=[(cmd, arg) for (sess, cmd, arg) in records]
+                )
+            elif self.args.shells:
+                Display.info(what='Viewing all saved shell process ', info=' [ NOT IMPLEMENTED YET ]')
+            else:
+                Display.info(what='Viewing all processes ', info=' [ NOT IMPLEMENTED YET ]')
+
+        elif self.args.sessions:
+            self.__opt_flags_check(['links', 'shells', 'all'])
+            if self.args.links:
+                tables = ['links']
+            elif self.args.shells:
+                Display.info(what='Viewing all session name under table : "shells" ', info=' [ NOT IMPLEMENTED YET ]')
+                return
+            else:
+                tables = config.TABLES.values()
+
+            sessions = self.__all_sessions(tables=tables)
+
             Display.dataframe(
-                headers=headers,
-                rows=[(cmd, arg) for (sess, cmd, arg) in records]
+                headers=['Table Name', 'List of Session'],
+                rows=sessions
             )
         else:
-            Display.info(what='Viewing all saved shell process ', info=' [ NOT IMPLEMENTED YET ]')
-
-        # if self.args.all_sessions:
-        #     sessions = self.__all_sessions(tables=config.TABLES.values())
-        #     Display.dataframe(
-        #         headers=['Table Name', 'List of Session'],
-        #         rows=sessions
-        #     )
-        # elif self.args.name:
-        #     headers = ['Command', 'Arguments']
-        #     for table in config.TABLES.values():
-        #         Display.title(title='Record for Session : {0} , Table: {1}'.format(self.name, table))
-        #         records = self.__record(table=table)
-        #         Display.dataframe(
-        #             headers=headers,
-        #             rows=[(cmd, arg) for (sess, cmd, arg) in records]
-        #         )
+            self.parser.error(message='Missing argument from [{0}, {1}]'.format('-n/name', '--sessions'))
 
     def __display_links_for_edit(self, table, records):
         Display.title(title='Record for Session : {0}, Table: {1}'.format(self.name, table))
