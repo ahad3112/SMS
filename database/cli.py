@@ -1,3 +1,8 @@
+'''
+Author :
+    * Muhammed Ahad  <ahad3112@yahoo.com, maaahad@gmail.com>
+'''
+
 from core.commands import Command
 from core.arguments import Argument
 

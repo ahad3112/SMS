@@ -1,3 +1,8 @@
+'''
+Author :
+    * Muhammed Ahad  <ahad3112@yahoo.com, maaahad@gmail.com>
+'''
+
 import sqlite3
 import os
 import sys

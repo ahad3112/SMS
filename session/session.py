@@ -1,3 +1,8 @@
+'''
+Author :
+    * Muhammed Ahad  <ahad3112@yahoo.com, maaahad@gmail.com>
+'''
+
 from datetime import date
 import os
 import sys
@@ -224,7 +229,7 @@ class Session:
             else:
                 pass
 
-            Display.success('Deletion was ', info=' [ SUCCESS ]')
+            Display.success('Deleting All ', info=' [ SUCCESS ]')
 
     def delete_row(self, *, table, records, row):
         sql_string = 'delete from {0} where session = ? and command = ? and links = ?'.format(table)
