@@ -81,15 +81,7 @@ class Database:
                 (table[0], [col[1] for col in columns])
             )
 
-        Display.list_data(headers=['Table Name', 'Columns'], data=data)
-        # Checking
-        Display.list_data(data=data)
-        Display.list_data(data=data)
-        Display.list_data(data=data)
-        Display.list_data(data=data)
-        Display.list_data(data=data)
-
-        # print(data)
+        Display.dataframe(headers=['Table Name', 'Columns'], rows=data)
 
     def __table_exists(self, *, table, trace=False):
         all_tables = self.get_tables()

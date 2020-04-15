@@ -166,18 +166,27 @@ class Session:
             if not records:
                 Display.info(what='No record available to delete for {0} '.format(self.name), info=' [QUITING]')
                 break
-            Display.info('Type Row no to delete ', info=' [ q/Q to Quit]')
+            Display.info('Type Comma or space separated row no to delete ', info=' [ q/Q to Quit]')
+
             confirmation = input()
-            if confirmation.isdigit():
-                # add row deletion logic
-                row = int(confirmation)
-                self.delete_row(table=config.TABLES['links'], records=records, row=row)
-                # Display.title(title='Row {0} Deletion was successfull'.format(confirmation))
-                Display.info(what='Row {0} Deletion '.format(confirmation), info=' [ SUCCESS ]')
-                print()
-            elif confirmation in ['q', 'Q']:
+            if confirmation in ['q', 'Q']:
                 Display.info(what='You chose to Quit ', info=' [ Leaving]')
                 break
+            else:
+                # extracting all row no from confirmation
+                rows = []
+                for element in confirmation.split():
+                    rows.extend(element.split(','))
+                # Now deleting one row at a time
+                for row in rows:
+                    if row.isdigit() and int(row) < len(records):
+                        # add row deletion logic
+                        row = int(row)
+                        self.delete_row(table=config.TABLES['links'], records=records, row=row)
+                        Display.info(what='Row "{0}"" Deletion '.format(row), info=' [ SUCCESS ]')
+                        print()
+                    else:
+                        Display.warning(what='Row "{0}" deletion : Not Digit or beyond the record length '.format(row), info=' [ FAILED ]')
 
     def __add(self, *, table, commands):
         Display.title(title='Adding to table "{0}" for Session "{1}"'.format(table, self.name))
